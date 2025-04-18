@@ -3,5 +3,5 @@ joblib
 scikit-learn
 newspaper3k
 wheel==0.45.1
-\# For Heroku Gunicorn
 gunicorn
+PyMuPDF
