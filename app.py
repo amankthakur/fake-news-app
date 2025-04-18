@@ -1,6 +1,5 @@
 from flask import Flask, request, render_template, session
 import joblib, os, csv
-#import fitz
 from newspaper import Article
 from werkzeug.utils import secure_filename
 from io import StringIO
@@ -15,18 +14,12 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'csv'}
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 def extract_text_from_pdf(filepath):
-    text = ""
-    with fitz.open(filepath) as doc:
-        for page in doc:
-            text += page.get_text()
-    return text
-
+    # PDF extraction disabled for now
+    return "PDF support is currently disabled."
 
 def extract_text_from_csv(filepath):
     with open(filepath, newline='', encoding='utf-8') as f:
@@ -34,17 +27,14 @@ def extract_text_from_csv(filepath):
         rows = list(reader)
         return "\n".join([" ".join(row) for row in rows if row])
 
-
 def extract_text_from_txt(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
-
 
 @app.route("/", methods=["GET"])
 def index():
     history = session.get('history', [])
     return render_template("index.html", history=history)
-
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -79,7 +69,6 @@ def predict():
     except Exception as e:
         return f"<div class='alert alert-danger'>Error during prediction: {str(e)}</div>"
 
-
 @app.route("/upload", methods=["POST"])
 def upload():
     uploaded_file = request.files.get("file")
@@ -95,8 +84,7 @@ def upload():
 
     try:
         if filename.endswith(".pdf"):
-            text = extract_text_from_pdf(filepath)
-            return "PDF support temporarily disabled."
+            return "<div class='alert alert-warning'>PDF support is currently disabled. Please use TXT or CSV instead.</div>"
         elif filename.endswith(".csv"):
             text = extract_text_from_csv(filepath)
         elif filename.endswith(".txt"):
