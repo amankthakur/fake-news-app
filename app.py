@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, session
-import joblib, os, fitz, csv
+import joblib, os, csv
+#import fitz
 from newspaper import Article
 from werkzeug.utils import secure_filename
 from io import StringIO
