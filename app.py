@@ -1,108 +1,51 @@
 from flask import Flask, request, render_template, session
-import joblib, os, csv
+import joblib, os
 from newspaper import Article
-from werkzeug.utils import secure_filename
-from io import StringIO
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # For session history
+app.secret_key = 'supersecretkey'  # for session-based history
 
-model = joblib.load(os.path.join("model", "fake_news_model.pkl"))
+# load your pretrained model + vectorizer
+model      = joblib.load(os.path.join("model", "fake_news_model.pkl"))
 vectorizer = joblib.load(os.path.join("model", "vectorizer.pkl"))
-
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'csv'}
-UPLOAD_FOLDER = 'uploads'
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def extract_text_from_pdf(filepath):
-    # PDF extraction disabled for now
-    return "PDF support is currently disabled."
-
-def extract_text_from_csv(filepath):
-    with open(filepath, newline='', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        rows = list(reader)
-        return "\n".join([" ".join(row) for row in rows if row])
-
-def extract_text_from_txt(filepath):
-    with open(filepath, 'r', encoding='utf-8') as f:
-        return f.read()
 
 @app.route("/", methods=["GET"])
 def index():
-    history = session.get('history', [])
+    history = session.get("history", [])
     return render_template("index.html", history=history)
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    news_text = request.form.get("news_text", "").strip()
-    news_url = request.form.get("news_url", "").strip()
-    result_html = ""
+    text = request.form.get("news_text", "").strip()
+    url  = request.form.get("news_url", "").strip()
 
-    if not news_text and not news_url:
-        return "<div class='alert alert-warning'>Please enter text or URL of an article to check.</div>"
+    if not text and not url:
+        return "<div class='alert alert-warning'>Please enter news text or a URL.</div>"
 
-    if news_url:
+    if url:
         try:
-            article = Article(news_url)
-            article.download()
-            article.parse()
-            news_text = article.text
+            art = Article(url)
+            art.download(); art.parse()
+            text = art.text
         except Exception:
-            return "<div class='alert alert-danger'>Failed to fetch article from URL.</div>"
+            return "<div class='alert alert-danger'>Could not fetch article from URL.</div>"
 
     try:
-        vec_input = vectorizer.transform([news_text])
-        result = model.predict(vec_input)[0]
-        label = "FAKE" if result == 1 else "REAL"
-        result_html = f"<div class='alert alert-info'><strong>Prediction:</strong> {label}</div>"
+        vec   = vectorizer.transform([text])
+        pred  = model.predict(vec)[0]
+        label = "FAKE" if pred == 1 else "REAL"
+        out   = f"<div class='alert alert-info'><strong>Prediction:</strong> {label}</div>"
 
-        # Store in session history
-        history = session.get('history', [])
-        history.insert(0, {"text": news_text[:200] + '...', "result": label})
-        session['history'] = history[:10]
+        # save to session history
+        h = session.get("history", [])
+        h.insert(0, {"text": text[:100]+"…", "result": label})
+        session["history"] = h[:10]
 
-        return result_html
+        return out
+
     except Exception as e:
-        return f"<div class='alert alert-danger'>Error during prediction: {str(e)}</div>"
-
-@app.route("/upload", methods=["POST"])
-def upload():
-    uploaded_file = request.files.get("file")
-    if not uploaded_file or uploaded_file.filename == '':
-        return "<div class='alert alert-warning'>No file selected.</div>"
-
-    if not allowed_file(uploaded_file.filename):
-        return "<div class='alert alert-warning'>Unsupported file type.</div>"
-
-    filename = secure_filename(uploaded_file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    uploaded_file.save(filepath)
-
-    try:
-        if filename.endswith(".pdf"):
-            return "<div class='alert alert-warning'>PDF support is currently disabled. Please use TXT or CSV instead.</div>"
-        elif filename.endswith(".csv"):
-            text = extract_text_from_csv(filepath)
-        elif filename.endswith(".txt"):
-            text = extract_text_from_txt(filepath)
-        else:
-            return "<div class='alert alert-danger'>Unsupported file format.</div>"
-
-        vec_input = vectorizer.transform([text])
-        result = model.predict(vec_input)[0]
-        label = "FAKE" if result == 1 else "REAL"
-
-        history = session.get('history', [])
-        history.insert(0, {"text": f"File: {filename}", "result": label})
-        session['history'] = history[:10]
-
-        return f"<div class='alert alert-success'>File <strong>{filename}</strong> analyzed: <strong>{label}</strong></div>"
-    except Exception as e:
-        return f"<div class='alert alert-danger'>Error reading file: {str(e)}</div>"
+        return f"<div class='alert alert-danger'>Error: {e}</div>"
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # use 0.0.0.0 & PORT in production; for local just running debug is fine
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
