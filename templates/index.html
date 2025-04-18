@@ -4,48 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Veracity Vigilance</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background: #f0f2f5; }
-    .card { margin: 50px auto; max-width: 600px; }
-    footer { text-align: center; margin: 20px 0; color: #666; }
+    body {
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    .card {
+      margin: 50px auto;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      animation: slideUp 1s ease;
+    }
+    .btn-primary {
+      background-color: #4a90e2;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+      background-color: #357ABD;
+    }
+    footer {
+      text-align: center;
+      margin: 20px 0;
+      color: #666;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    textarea {
+      resize: vertical;
+    }
   </style>
 </head>
 <body>
   <div class="card shadow-sm">
     <div class="card-body">
-      <h3 class="card-title text-center mb-4">Veracity Vigilance</h3>
+      <h3 class="card-title text-center mb-4 text-primary">
+        <i class="fas fa-shield-alt me-2"></i>Veracity Vigilance
+      </h3>
       <form action="/predict" method="post">
         <div class="mb-3">
-          <label class="form-label">Article URL (optional)</label>
-          <input type="url" name="news_url" class="form-control"
-                 placeholder="https://example.com/article">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Or Paste Text</label>
-          <textarea name="news_text" class="form-control" rows="6"
-                    placeholder="Enter news here…"></textarea>
+          <label class="form-label">Enter News Text</label>
+          <textarea name="news" class="form-control" rows="6" placeholder="Paste your news content here..."></textarea>
         </div>
         <button type="submit" class="btn btn-primary w-100">
-          Analyze
+          Analyze <i class="fas fa-search ms-2"></i>
         </button>
       </form>
 
-      <!-- show history if any -->
-      {% if history %}
-      <hr>
-      <h6>Recent Checks</h6>
-      <ul class="list-group">
-        {% for item in history %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          {{ item.text }}
-          <span class="badge bg-{{ 'danger' if item.result=='FAKE' else 'success' }}">
-            {{ item.result }}
-          </span>
-        </li>
-        {% endfor %}
-      </ul>
+      {% if prediction_text %}
+      <div class="alert alert-info text-center mt-4 animate__animated animate__fadeIn">
+        {{ prediction_text }}
+      </div>
       {% endif %}
     </div>
   </div>
