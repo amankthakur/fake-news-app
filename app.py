@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Load model and vectorizer
+# Load the model and vectorizer
 model = joblib.load(os.path.join("model", "fake_news_model.pkl"))
 vectorizer = joblib.load(os.path.join("model", "vectorizer.pkl"))
 
@@ -27,4 +27,6 @@ def predict():
         return render_template("index.html", prediction_text=f"Error: {str(e)}")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host="0.0.0.0", port=port)
