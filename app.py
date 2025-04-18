@@ -5,10 +5,13 @@ import os
 app = Flask(__name__)
 
 # Load the model and vectorizer
-model = joblib.load(os.path.join("model", "fake_news_model.pkl"))
-vectorizer = joblib.load(os.path.join("model", "vectorizer.pkl"))
+MODEL_PATH = os.path.join("model", "fake_news_model.pkl")
+VECTORIZER_PATH = os.path.join("model", "vectorizer.pkl")
 
-@app.route("/")
+model = joblib.load(MODEL_PATH)
+vectorizer = joblib.load(VECTORIZER_PATH)
+
+@app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
 
@@ -19,14 +22,15 @@ def predict():
         return render_template("index.html", prediction_text="Please enter some news text to evaluate.")
 
     try:
+        # Ensure consistent input shape
         vec_input = vectorizer.transform([news])
         result = model.predict(vec_input)[0]
         label = "FAKE" if result == 1 else "REAL"
         return render_template("index.html", prediction_text=f"This news is likely {label}.")
     except Exception as e:
-        return render_template("index.html", prediction_text=f"Error: {str(e)}")
+        print("Prediction Error:", e)  # for logs/debugging
+        return render_template("index.html", prediction_text="An error occurred during prediction. Please try again.")
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host="0.0.0.0", port=port)
