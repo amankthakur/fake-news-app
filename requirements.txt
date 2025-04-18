@@ -1,0 +1,5 @@
+
+Flask
+joblib
+scikit-learn
+wheel==0.45.1
