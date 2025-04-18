@@ -8,29 +8,48 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       animation: fadeIn 1.2s ease-in-out;
+      color: #fff;
     }
     .card {
       margin: 50px auto;
       max-width: 600px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      border-radius: 20px;
+      background: #ffffff10;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
       animation: slideUp 1s ease;
+      color: #fff;
+    }
+    .form-control {
+      background-color: #ffffff15;
+      color: #fff;
+      border: 1px solid #ffffff30;
+    }
+    .form-control::placeholder {
+      color: #bbb;
     }
     .btn-primary {
-      background-color: #4a90e2;
+      background: linear-gradient(to right, #36d1dc, #5b86e5);
       border: none;
-      transition: background-color 0.3s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .btn-primary:hover {
-      background-color: #357ABD;
+      transform: scale(1.03);
+      box-shadow: 0 5px 20px rgba(91, 134, 229, 0.5);
+    }
+    .alert-info {
+      background-color: #36d1dc;
+      color: #fff;
+      border: none;
+      font-weight: 500;
     }
     footer {
       text-align: center;
-      margin: 20px 0;
-      color: #666;
+      margin: 30px 0;
+      color: #ccc;
     }
     @keyframes fadeIn {
       from { opacity: 0; }
@@ -48,7 +67,7 @@
 <body>
   <div class="card shadow-sm">
     <div class="card-body">
-      <h3 class="card-title text-center mb-4 text-primary">
+      <h3 class="card-title text-center mb-4 text-info">
         <i class="fas fa-shield-alt me-2"></i>Veracity Vigilance
       </h3>
       <form action="/predict" method="post">
