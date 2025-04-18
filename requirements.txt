@@ -5,3 +5,4 @@ newspaper3k
 wheel==0.45.1
 gunicorn
 PyMuPDF
+PyMuPDF==1.23.7
