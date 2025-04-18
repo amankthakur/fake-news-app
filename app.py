@@ -96,6 +96,7 @@ def upload():
     try:
         if filename.endswith(".pdf"):
             text = extract_text_from_pdf(filepath)
+            return "PDF support temporarily disabled."
         elif filename.endswith(".csv"):
             text = extract_text_from_csv(filepath)
         elif filename.endswith(".txt"):
