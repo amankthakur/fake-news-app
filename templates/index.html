@@ -52,35 +52,25 @@
       margin: 30px 0;
       color: #ccc;
     }
-    /* Result animations */
-    .fake-news {
-      animation: flashRed 1s ease;
+    textarea { resize: vertical; }
+
+    .flash-fake {
+      animation: flashRed 5s ease-in-out;
     }
-    .real-news {
-      animation: flashGreen 1s ease;
+    .flash-real {
+      animation: flashGreen 5s ease-in-out;
     }
     @keyframes flashRed {
-      0% { background-color: rgba(255, 0, 0, 0.2); }
-      50% { background-color: rgba(255, 0, 0, 0.6); }
+      0% { background-color: #ff0000; }
       100% { background-color: transparent; }
     }
     @keyframes flashGreen {
-      0% { background-color: rgba(0, 255, 0, 0.2); }
-      50% { background-color: rgba(0, 255, 0, 0.6); }
+      0% { background-color: #00cc00; }
       100% { background-color: transparent; }
     }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    textarea { resize: vertical; }
   </style>
 </head>
-<body class="{% if prediction_text %}{% if 'FAKE' in prediction_text %}fake-news{% else %}real-news{% endif %}{% endif %}">
+<body class="{% if prediction_text %}{% if 'FAKE' in prediction_text %}flash-fake{% else %}flash-real{% endif %}{% endif %}">
   <div class="card shadow-sm">
     <div class="card-body">
       <h3 class="card-title text-center mb-4 text-info">
